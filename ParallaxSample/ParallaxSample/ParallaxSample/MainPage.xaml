@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ParallaxSample.MainPage">
+
+    <Grid RowDefinitions="*" ColumnDefinitions="*" VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand">
+        <ListView x:Name="lstView" TranslationY="150" Scrolled="lstView_Scrolled" />
+        <StackLayout x:Name="HeaderFrame"  VerticalOptions="Start" HeightRequest="150" BackgroundColor="LightGray">
+            <Label Text="Header" />
+            <Label Text="Content" />
+            <Label x:Name="ScrollYLabel" Text="HEADER" FontAttributes="Bold" VerticalOptions="End" VerticalTextAlignment="End">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped"/>
+                </Label.GestureRecognizers>
+            </Label>
+            <Label x:Name="ListY" Text="List Y" />
+            <Label x:Name="StackY" Text="Stack Y" />
+        </StackLayout>
+    </Grid>
+
+</ContentPage>
