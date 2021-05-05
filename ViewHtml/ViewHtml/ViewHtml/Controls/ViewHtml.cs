@@ -48,6 +48,9 @@ namespace ViewHtml.Controls
                 val = Regex.Replace(val, "<p([^>]*)>", string.Empty);
                 val = Regex.Replace(val, "<div([^>]*)>", string.Empty);
 
+                val = Regex.Replace(val, "<ul([^>]*)>", string.Empty);
+                val = val.Replace("</ul>", string.Empty);
+
                 val = Regex.Replace(val, "&nbsp;", " ");
                 val = val.Replace("</b>", string.Empty);
                 val = val.Replace("</span>", string.Empty);
@@ -252,12 +255,6 @@ namespace ViewHtml.Controls
                     itemSection.Text = itemSection.Text.Remove(matchItem.Index, matchItem.Value.Length);
                     itemSection.Text = itemSection.Text.Substring(0, matchItem.Index);
                 }
-
-
-                /*
-                itemSection.Text = Regex.Replace(itemSection.Text, $"<{tagHml}.*?>", string.Empty);
-                itemSection.Text = Regex.Replace(itemSection.Text, $"</{tagHml}>", string.Empty);
-                */
 
                 switch (tagHml)
                 {
