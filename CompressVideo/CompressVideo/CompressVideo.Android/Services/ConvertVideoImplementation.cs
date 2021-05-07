@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 [assembly: Xamarin.Forms.Dependency(typeof(ConvertVideoImplementation))]
 namespace CompressVideo.Droid.Services
@@ -29,6 +30,11 @@ namespace CompressVideo.Droid.Services
         public event EventHandler<float> Percent;
         public event EventHandler<bool> Success;
         public event EventHandler<string> Fail;
+
+        public void CompressVideoAndroid(string srcPath, string destPath, int bitrateMode = 10)
+        {
+            throw new NotImplementedException();
+        }
 
         public void ConvertVideo(string srcPath, string destPath, int bitrateMode = 10)
         {
@@ -141,6 +147,12 @@ namespace CompressVideo.Droid.Services
             {
                 Success(this, true);
             }
+        }
+
+        //Nao disponivel para iOS
+        public Task<bool> CompressVideoiOS(string inputPath, string outputPath)
+        {
+            throw new NotImplementedException();
         }
 
     }

@@ -32,8 +32,6 @@ namespace CompressVideo
 
         private async void Button_Clicked(object sender, EventArgs e)
         {
-
-
             PermissionStatus statusPastaRead = await Permissions.CheckStatusAsync<Permissions.StorageRead>(),
                              statusPastaWrite = await Permissions.CheckStatusAsync<Permissions.StorageWrite>();
 
@@ -54,16 +52,37 @@ namespace CompressVideo
                 //Seleciona o arquivo de vídeo
                 var video = await MediaPicker.PickVideoAsync();
                 await LoadPhotoAsync(video);
-
+                    
                 //Mostra informações do vídeo de origem
                 var sizeSrc = new FileInfo(video.FullPath).Length;
                 sizeSrcLabel.Text = sizeSrc.ToString();
 
+                //Busca a bliblioteca nativa para verficiar o vídeo
                 var convertVideo = DependencyService.Get<IConvertVideoService>();
 
+                //Verifica o bitrate para verificar se vai precisar comprimir o arquivo
                 bool needConvert = convertVideo.NeedCompress(video.FullPath, 10);
 
-                if (needConvert)
+                string exportPath = String.Empty;
+                string exportFilePath = String.Empty;
+
+                //Converte o arquivo para cada plataforma
+                if (needConvert && Device.RuntimePlatform == Device.iOS)
+                {
+                    exportPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                    exportFilePath = Path.Combine(exportPath, "compressed_video.mp4");
+
+                    var succes = await convertVideo.CompressVideoiOS(video.FullPath, exportFilePath);
+
+                    if (File.Exists(exportFilePath))
+                    {
+                        var newVideo2 = new FileInfo(exportFilePath);
+                        var sizeNew2 = newVideo2.Length;
+                        sizeDestLabel.Text = sizeNew2.ToString();
+                    }
+                }
+
+                if (needConvert && Device.RuntimePlatform == Device.Android)
                 {
                     Device.StartTimer(TimeSpan.FromMilliseconds(1000), () =>
                     {
@@ -74,7 +93,7 @@ namespace CompressVideo
                         return polling;
                     });
 
-                    var newFile = Path.Combine(FileSystem.CacheDirectory, "converted_" + video.FileName);
+                    exportFilePath = Path.Combine(FileSystem.CacheDirectory, "compressed_" + video.FileName);
 
                     convertVideo.Percent += (object sender, float e) =>
                     {
@@ -83,18 +102,12 @@ namespace CompressVideo
 
                     convertVideo.Success += (object sender, bool e) =>
                     {
-                        var newVideo = new FileInfo(newFile);
+                        var newVideo = new FileInfo(exportFilePath);
                         var sizeNew = newVideo.Length;
                         sizeDestLabel.Text = sizeNew.ToString();
-
-                        using (FileStream fs = File.OpenRead(newFile))
-                            DependencyService.Get<IFileService>().SaveFile("converted.mp4", fs, "videoFolder");
-
                     };
 
-                    convertVideo.ConvertVideo(PhotoPath, newFile, 10);
-
-                    Console.WriteLine($"CapturePhotoAsync COMPLETED: {PhotoPath}");
+                    convertVideo.CompressVideoAndroid(PhotoPath, exportFilePath);
                 }
 
             }
@@ -129,7 +142,6 @@ namespace CompressVideo
 
             PhotoPath = newFile;
         }
-
 
     }
 }
