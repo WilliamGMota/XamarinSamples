@@ -33,10 +33,14 @@ namespace CompressVideo
         private async void Button_Clicked(object sender, EventArgs e)
         {
             PermissionStatus statusPastaRead = await Permissions.CheckStatusAsync<Permissions.StorageRead>(),
-                             statusPastaWrite = await Permissions.CheckStatusAsync<Permissions.StorageWrite>();
+                             statusPastaWrite = await Permissions.CheckStatusAsync<Permissions.StorageWrite>(),
+                             camera = await Permissions.CheckStatusAsync<Permissions.Camera>(),
+                             media = await Permissions.CheckStatusAsync<Permissions.Media>() ;
 
             if (await Permissions.RequestAsync<Permissions.StorageRead>() == PermissionStatus.Granted &&
-                await Permissions.RequestAsync<Permissions.StorageWrite>() == PermissionStatus.Granted)
+                await Permissions.RequestAsync<Permissions.StorageWrite>() == PermissionStatus.Granted &&
+                await Permissions.RequestAsync<Permissions.Camera>() == PermissionStatus.Granted &&
+                await Permissions.RequestAsync<Permissions.Media>() == PermissionStatus.Granted)
             {
                 await SelectVideoAsync();
             }
@@ -50,7 +54,9 @@ namespace CompressVideo
                 polling = true;
 
                 //Seleciona o arquivo de vídeo
-                var video = await MediaPicker.PickVideoAsync();
+                //var video = await MediaPicker.PickVideoAsync();
+
+                var video = await MediaPicker.CaptureVideoAsync();
                 await LoadPhotoAsync(video);
                     
                 //Mostra informações do vídeo de origem
@@ -62,7 +68,7 @@ namespace CompressVideo
 
                 //Verifica o bitrate para verificar se vai precisar comprimir o arquivo
                 bool needConvert = convertVideo.NeedCompress(video.FullPath, 10);
-
+                needConvert = true;
                 string exportPath = String.Empty;
                 string exportFilePath = String.Empty;
 
@@ -72,14 +78,27 @@ namespace CompressVideo
                     exportPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
                     exportFilePath = Path.Combine(exportPath, "compressed_video.mp4");
 
-                    var succes = await convertVideo.CompressVideoiOS(video.FullPath, exportFilePath);
+                    convertVideo.Success += (object sender, bool e) =>
+                    {
+                        var newVideo = new FileInfo(exportFilePath);
+                        var sizeNew = newVideo.Length;
+                        sizeDestLabel.Text = sizeNew.ToString();
+                    };
 
-                    if (File.Exists(exportFilePath))
+                    convertVideo.Fail += (object sender, string e) =>
+                    {
+                        var newVideo = new FileInfo(exportFilePath);
+                    };
+
+                    var succes = await convertVideo.CompressVideoiOS(video.FullPath, exportFilePath);
+                    /*
+                    if (succes && File.Exists(exportFilePath))
                     {
                         var newVideo2 = new FileInfo(exportFilePath);
                         var sizeNew2 = newVideo2.Length;
                         sizeDestLabel.Text = sizeNew2.ToString();
                     }
+                    */
                 }
 
                 if (needConvert && Device.RuntimePlatform == Device.Android)

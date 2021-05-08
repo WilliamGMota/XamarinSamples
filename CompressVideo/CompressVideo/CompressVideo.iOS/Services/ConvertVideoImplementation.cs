@@ -4,6 +4,7 @@ using AVFoundation;
 using Foundation;
 using System.Linq;
 using System.Threading.Tasks;
+using System.IO;
 
 [assembly: Xamarin.Forms.Dependency(typeof(ConvertVideoImplementation))]
 namespace CompressVideo.iOS.Services
@@ -35,6 +36,10 @@ namespace CompressVideo.iOS.Services
 
             float bitrate = 0;
 
+            if (File.Exists(outputPath))
+                File.Delete(outputPath);
+
+
             //Buscar o bitrate do video
             try
             {
@@ -51,12 +56,12 @@ namespace CompressVideo.iOS.Services
             //Define a qualidade
             bitrateMode = bitrateMode == 10 ? bitrateMode10 : bitrateMode2;
 
-            if (bitrate > 0 && bitrate > bitrateMode2)
+            if (bitrate > 0 && bitrate > bitrateMode)
             {
-                float reduce = (float)bitrate / (float)bitrateMode2;
+                float reduce = (float)bitrate / (float)bitrateMode;
                 if (reduce > 6)
                     quality = AVAssetExportSessionPreset.LowQuality;
-                else if (reduce > 3)
+                else if (reduce > 1.1)
                     quality = AVAssetExportSessionPreset.MediumQuality;
             }
 
@@ -85,8 +90,17 @@ namespace CompressVideo.iOS.Services
             await exp.ExportTaskAsync();
             if (exp.Status == AVAssetExportSessionStatus.Completed)
             {
-                System.Diagnostics.Debug.WriteLine("Finished export");
+                Success(this, true);
             }
+            else if (exp.Status == AVAssetExportSessionStatus.Failed)
+            {
+                Fail(this, exp.Error.Description);
+            }
+            else
+            {
+                Fail(this, exp.Error.Description);
+            }
+
         }
 
         /// <summary>
