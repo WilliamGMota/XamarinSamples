@@ -24,21 +24,21 @@ namespace CompressVideo.iOS.Services
         }
 
         /// <summary>
-        /// Comprime o vídeo para fazer upload
+        /// Compress the video
         /// </summary>
         /// <param name="inputPath">Arquivo de Origem</param>
         /// <param name="outputPath">Arquivo de Destino</param>
         /// <returns></returns>
-        public async Task<bool> CompressVideoiOS(string inputPath, string outputPath, int bitrateMode = 10)
+        public async Task CompressVideo(string inputPath, string outputPath, int bitrateMode = 10)
         {
 
-            AVAssetExportSessionPreset quality = AVAssetExportSessionPreset.HighestQuality;
+            AVAssetExportSessionPreset quality = AVAssetExportSessionPreset.Preset1280x720;
 
             float bitrate = 0;
 
+            //Delete compress video if exist
             if (File.Exists(outputPath))
                 File.Delete(outputPath);
-
 
             //Buscar o bitrate do video
             try
@@ -82,7 +82,7 @@ namespace CompressVideo.iOS.Services
                 System.Diagnostics.Debug.WriteLine("Erro ao comprimir video");
             }
 
-            return true;
+            return;
         }
 
         private async Task RunExportAsync(AVAssetExportSession exp)
@@ -98,16 +98,15 @@ namespace CompressVideo.iOS.Services
             }
             else
             {
-                Fail(this, exp.Error.Description);
+                Fail(this, "Fail to compress video. Error unknown");
             }
-
         }
 
         /// <summary>
-        /// Verifica se a taxa do bitrate está de acordo com 2 ou 10 megas
+        /// Check bitrate video is bigger than 2 or 10
         /// </summary>
-        /// <param name="srcPath">Caminho do arquivo de vídeo</param>
-        /// <param name="bitrateMode">Taxa do bitrate 2 ou 10</param>
+        /// <param name="srcPath">Video file path</param>
+        /// <param name="bitrateMode">Max bitrate allowed</param>
         /// <returns></returns>
         public bool NeedCompress(string srcPath, int bitrateMode = 10)
         {
@@ -131,12 +130,5 @@ namespace CompressVideo.iOS.Services
 
             return false;
         }
-
-        // Funcao utilizada apenas no projeto Android
-        public void CompressVideoAndroid(string srcPath, string destPath, int bitrateMode = 10)
-        {
-            throw new NotImplementedException();
-        }
     }
-
 }
