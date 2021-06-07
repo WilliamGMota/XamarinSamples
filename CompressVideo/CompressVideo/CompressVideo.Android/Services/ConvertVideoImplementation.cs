@@ -23,31 +23,29 @@ namespace CompressVideo.Droid.Services
         const int bitrateMode10 = 1024 * 10;
         const int bitrateMode2 = 1024 * 2;
 
-        public ConvertVideoImplementation()
-        {
-        }
-
         public event EventHandler<float> Percent;
         public event EventHandler<bool> Success;
         public event EventHandler<string> Fail;
 
-        public void CompressVideoAndroid(string srcPath, string destPath, int bitrateMode = 10)
+        public ConvertVideoImplementation()
         {
-            throw new NotImplementedException();
         }
 
-        public void ConvertVideo(string srcPath, string destPath, int bitrateMode = 10)
+        public async Task CompressVideo(string srcPath, string destPath, int bitrateMode = 10)
         {
+
+            await Task.Delay(10);
+
             try
             {
-                //Busca dados do vídeo
+                //Get the video metadata
                 var mediaMetadataRetriever = new MediaMetadataRetriever();
                 mediaMetadataRetriever.SetDataSource(srcPath);
                 string bitrateData = mediaMetadataRetriever.ExtractMetadata(Android.Media.MetadataKey.Bitrate);
                 string videoHeight = mediaMetadataRetriever.ExtractMetadata(Android.Media.MetadataKey.VideoHeight);
                 string videoWidth = mediaMetadataRetriever.ExtractMetadata(Android.Media.MetadataKey.VideoWidth);
 
-                //Define a compressão padrão para alta
+                //Define default quality compress
                 var videoQuality = VideoQuality.High;
 
                 bitrateMode = bitrateMode == 10 ? bitrateMode10 : bitrateMode2;
@@ -90,7 +88,7 @@ namespace CompressVideo.Droid.Services
         {
             try
             {
-                //Busca dados do vídeo
+                //Get video metada
                 var mediaMetadataRetriever = new MediaMetadataRetriever();
                 mediaMetadataRetriever.SetDataSource(srcPath);
                 string bitrateData = mediaMetadataRetriever.ExtractMetadata(Android.Media.MetadataKey.Bitrate);
@@ -114,7 +112,6 @@ namespace CompressVideo.Droid.Services
 
             return false;
         }
-
 
         public class CompressionListener : Java.Lang.Object, ICompressionListener
         {
@@ -147,12 +144,6 @@ namespace CompressVideo.Droid.Services
             {
                 Success(this, true);
             }
-        }
-
-        //Nao disponivel para iOS
-        public Task<bool> CompressVideoiOS(string inputPath, string outputPath)
-        {
-            throw new NotImplementedException();
         }
 
     }
