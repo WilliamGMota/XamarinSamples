@@ -67,7 +67,12 @@ namespace XamarinMonthYearPicker.Droid
                 {
                     Dialog.Cancel();
                     OnClosed?.Invoke(dialog, selectedDate);
-                });
+                })
+                .SetNeutralButton("Limpar", (sender, e) =>
+                 {
+                     Dialog.Cancel();
+                     OnClosed?.Invoke(dialog, selectedDate);
+                 });
             return builder.Create();
         }
 

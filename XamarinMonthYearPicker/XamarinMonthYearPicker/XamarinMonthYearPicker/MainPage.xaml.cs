@@ -10,9 +10,16 @@ namespace XamarinMonthYearPicker
 {
     public partial class MainPage : ContentPage
     {
+
         public MainPage()
         {
             InitializeComponent();
+        }
+
+        private void Button_Clicked(object sender, EventArgs e)
+        {
+            string teste = monthYearPicker.Date.ToString();
+            teste = teste;
         }
     }
 }

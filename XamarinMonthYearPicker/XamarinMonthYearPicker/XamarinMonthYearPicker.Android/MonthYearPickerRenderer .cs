@@ -1,5 +1,4 @@
 ﻿using Android.Content;
-using Android.Support.V4.App;
 using Android.Widget;
 
 using System;
@@ -83,15 +82,24 @@ namespace XamarinMonthYearPicker.Droid
         private DateTime? FormatDateToMonthYear(DateTime? dateTime) =>
             dateTime.HasValue ? (DateTime?)new DateTime(dateTime.Value.Year, dateTime.Value.Month, 1) : null;
 
+        [Obsolete]
         private void CreateAndSetNativeControl()
         {
             var tv = new EditText(_context);
 
             tv.SetTextColor(Element.TextColor.ToAndroid());
             tv.TextSize = (float)Element.FontSize;
-            tv.Text = $"{Element.Date.Month:D2} | {Element.Date.Year}";
+            if (Element.Date.Year == 1 && Element.Date.Month == 1)
+            {
+                tv.Text = $"De";
+                tv.TextSize = (float)Element.FontSize;
+            }
+            else
+            {
+                tv.Text = $"{Element.Date.Month:D2} | {Element.Date.Year}";
+            }
             tv.Gravity = Android.Views.GravityFlags.Center;
-            tv.SetBackgroundColor(Element.BackgroundColor.ToAndroid());
+            //tv.SetBackgroundColor(Element.BackgroundColor.ToAndroid());
 
             SetNativeControl(tv);
         }
@@ -117,6 +125,7 @@ namespace XamarinMonthYearPicker.Droid
         {
             Element.Date = e;
             Control.Text = $"{Element.Date.Month:D2} | {Element.Date.Year}";
+            Control.TextAlignment = Android.Views.TextAlignment.Center;
             ClearPickerFocus();
         }
 
